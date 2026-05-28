@@ -16,7 +16,7 @@ parch list              → paru -Q
 
 ```bash
 # Build from source
-git clone https://github.com/your-username/parch
+git clone https://github.com/acidnik/parch
 cd parch
 cargo build --release
 

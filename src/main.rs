@@ -76,7 +76,7 @@ enum Commands {
 #[derive(Args)]
 struct InstallArgs {
     /// Skip confirmation prompts
-    #[arg(long)]
+    #[arg(short = 'y', long)]
     noconfirm: bool,
 
     /// Don't reinstall up-to-date packages
@@ -90,7 +90,7 @@ struct InstallArgs {
 #[derive(Args)]
 struct UninstallArgs {
     /// Skip confirmation prompts
-    #[arg(long)]
+    #[arg(short = 'y', long)]
     noconfirm: bool,
 
     /// Package(s) to remove
@@ -100,7 +100,7 @@ struct UninstallArgs {
 #[derive(Args)]
 struct UpdateArgs {
     /// Skip confirmation prompts
-    #[arg(long)]
+    #[arg(short = 'y', long)]
     noconfirm: bool,
 }
 
@@ -137,7 +137,7 @@ struct InfoArgs {
 #[derive(Args)]
 struct CleanArgs {
     /// Skip confirmation prompts
-    #[arg(long)]
+    #[arg(short = 'y', long)]
     noconfirm: bool,
 }
 
@@ -247,6 +247,18 @@ function __fish_parch_using_subcommand
     contains -- $cmd[1] $argv
 end
 
+# ── Dynamic package helpers ──────────────────────────────────────────────────
+function __fish_parch_available_packages
+    set -l token (commandline -ct)
+    if test -z "$token"
+        # No token yet — list all repo packages (fast)
+        command pacman -Slq 2>/dev/null
+    else
+        # Search both repos AND AUR via paru
+        command paru -Ssq -- "$token" 2>/dev/null
+    end
+end
+
 # ── Commands ────────────────────────────────────────────────────────────────
 # Top-level completions
 complete -c parch -f -n '__fish_parch_needs_command' -a install     -d 'Install packages (paru -Sy)'
@@ -278,17 +290,17 @@ complete -c parch -f -n '__fish_parch_needs_command' -a w           -d 'Show why
 complete -c parch -f -n '__fish_parch_needs_command' -a completions -d 'Generate fish completions'
 
 # ── Flags ──────────────────────────────────────────────────────────────────
-complete -c parch -n '__fish_parch_using_subcommand install i' -l noconfirm -d 'Skip confirmation prompts'
+complete -c parch -n '__fish_parch_using_subcommand install i' -s y -l noconfirm -d 'Skip confirmation prompts'
 complete -c parch -n '__fish_parch_using_subcommand install i' -l needed    -d "Don't reinstall up-to-date packages"
-complete -c parch -n '__fish_parch_using_subcommand uninstall u' -l noconfirm -d 'Skip confirmation prompts'
-complete -c parch -n '__fish_parch_using_subcommand update up' -l noconfirm -d 'Skip confirmation prompts'
-complete -c parch -n '__fish_parch_using_subcommand clean c' -l noconfirm -d 'Skip confirmation prompts'
+complete -c parch -n '__fish_parch_using_subcommand uninstall u' -s y -l noconfirm -d 'Skip confirmation prompts'
+complete -c parch -n '__fish_parch_using_subcommand update up' -s y -l noconfirm -d 'Skip confirmation prompts'
+complete -c parch -n '__fish_parch_using_subcommand clean c' -s y -l noconfirm -d 'Skip confirmation prompts'
 
 # ── Global flags ─────────────────────────────────────────────────────────────
 complete -c parch -s v -l verbose -d 'Print the paru command'
-# ── Dynamic: available packages (install, search) ──────────────────────────
-complete -c parch -n '__fish_parch_using_subcommand install i' -a '(pacman -Slq 2>/dev/null)' -d 'Package'
-complete -c parch -n '__fish_parch_using_subcommand search s' -a '(pacman -Slq 2>/dev/null)' -d 'Package'
+# ── Dynamic: available packages with AUR support (install, search) ────────
+complete -c parch -n '__fish_parch_using_subcommand install i' -a '(__fish_parch_available_packages)' -d 'Package'
+complete -c parch -n '__fish_parch_using_subcommand search s' -a '(__fish_parch_available_packages)' -d 'Package'
 
 # ── Dynamic: installed packages (uninstall, filesof, info, deps, why) ─────
 complete -c parch -n '__fish_parch_using_subcommand uninstall u' -a '(pacman -Qq 2>/dev/null)' -d 'Installed'
