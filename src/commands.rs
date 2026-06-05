@@ -103,11 +103,30 @@ pub fn list(query: Option<&str>) {
     run(&mut cmd);
 }
 
-pub fn whichpkg(paths: &[String]) {
-    let mut cmd = paru();
-    cmd.arg("-Qo");
-    cmd.args(paths);
-    run(&mut cmd);
+pub fn whichpkg(paths: &[String], all: bool) {
+    if all {
+        let pkgfile_path = which::which("pkgfile");
+        match pkgfile_path {
+            Ok(_) => {
+                for path in paths {
+                    let mut cmd = Command::new("pkgfile");
+                    cmd.arg(path);
+                    run(&mut cmd);
+                }
+            }
+            Err(_) => {
+                eprintln!("warning: pkgfile is not installed");
+                eprintln!("  install: paru -S pkgfile && paru -Su -- pkgfile");
+                eprintln!("  then update file list: pkgfile -u");
+                std::process::exit(1);
+            }
+        }
+    } else {
+        let mut cmd = paru();
+        cmd.arg("-Qo");
+        cmd.args(paths);
+        run(&mut cmd);
+    }
 }
 
 pub fn filesof(packages: &[String]) {

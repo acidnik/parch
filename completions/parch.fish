@@ -83,5 +83,8 @@ complete -c parch -n '__fish_parch_using_subcommand info show' -a '(pacman -Qq 2
 complete -c parch -n '__fish_parch_using_subcommand deps d' -a '(pacman -Qq 2>/dev/null)' -d 'Installed'
 complete -c parch -n '__fish_parch_using_subcommand why w' -a '(pacman -Qq 2>/dev/null)' -d 'Installed'
 
+# ── Flags: whichpkg ────────────────────────────────────────────────────────
+complete -c parch -n '__fish_parch_using_subcommand whichpkg wp' -s a -l all -d 'Search all packages via pkgfile'
+
 # ── File paths (whichpkg) ─────────────────────────────────────────────────
 complete -c parch -n '__fish_parch_using_subcommand whichpkg wp' -k -a '(__fish_complete_path (commandline -ct))'

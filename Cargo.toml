@@ -6,3 +6,4 @@ description = "A user-friendly wrapper over paru/pacman for Arch Linux"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+which = "7"

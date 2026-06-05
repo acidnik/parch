@@ -9,6 +9,7 @@ arch=('x86_64')
 url="https://github.com/acidnik/parch"
 license=('MIT')
 depends=('paru' 'pacman')
+optdepends=('pkgfile: search files in all packages via whichpkg -a')
 makedepends=('cargo' 'git')
 source=("$pkgname::git+https://github.com/acidnik/parch.git")
 sha256sums=('SKIP')
@@ -16,7 +17,7 @@ sha256sums=('SKIP')
 build() {
     cd "$srcdir/$pkgname"
     export CARGO_HOME="$srcdir/cargo-home"
-    cargo build --release --frozen
+    cargo build --release --locked
 }
 
 check() {

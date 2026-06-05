@@ -118,6 +118,9 @@ struct ListArgs {
 
 #[derive(Args)]
 struct WhichPkgArgs {
+    /// Search all packages (not just installed), requires pkgfile
+    #[arg(short = 'a', long)]
+    all: bool,
     /// File path(s) to look up
     paths: Vec<String>,
 }
@@ -187,7 +190,7 @@ fn main() {
         }
         Commands::WhichPkg(args) => {
             commands::set_verbose(cli.verbose);
-            commands::whichpkg(&args.paths);
+            commands::whichpkg(&args.paths, args.all);
         }
         Commands::FilesOf(args) => {
             commands::set_verbose(cli.verbose);
@@ -308,6 +311,9 @@ complete -c parch -n '__fish_parch_using_subcommand filesof f' -a '(pacman -Qq 2
 complete -c parch -n '__fish_parch_using_subcommand info show' -a '(pacman -Qq 2>/dev/null)' -d 'Installed'
 complete -c parch -n '__fish_parch_using_subcommand deps d' -a '(pacman -Qq 2>/dev/null)' -d 'Installed'
 complete -c parch -n '__fish_parch_using_subcommand why w' -a '(pacman -Qq 2>/dev/null)' -d 'Installed'
+
+# ── Flags: whichpkg ────────────────────────────────────────────────────────
+complete -c parch -n '__fish_parch_using_subcommand whichpkg wp' -s a -l all -d 'Search all packages via pkgfile'
 
 # ── File paths (whichpkg) ─────────────────────────────────────────────────
 complete -c parch -n '__fish_parch_using_subcommand whichpkg wp' -k -a '(__fish_complete_path (commandline -ct))'
