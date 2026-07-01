@@ -89,18 +89,56 @@ pub fn search(query: &[String]) {
     run(&mut cmd);
 }
 
-pub fn list(query: Option<&str>) {
-    let mut cmd = paru();
-    match query {
-        Some(q) => {
-            cmd.arg("-Qs");
-            cmd.arg(q);
-        }
-        None => {
-            cmd.arg("-Q");
+fn build_repo_map() -> std::collections::HashMap<String, String> {
+    let output = Command::new("pacman")
+        .args(["-Sl"])
+        .output()
+        .expect("failed to run pacman -Sl");
+    let mut map = std::collections::HashMap::new();
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    for line in stdout.lines() {
+        // Format: "repo pkgname pkgver ..."
+        let mut parts = line.split_whitespace();
+        if let (Some(repo), Some(pkg)) = (parts.next(), parts.next()) {
+            map.insert(pkg.to_string(), repo.to_string());
         }
     }
-    run(&mut cmd);
+    map
+}
+
+pub fn list(query: Option<&str>, repo: bool) {
+    if repo {
+        let repo_map = build_repo_map();
+
+        let output = match query {
+            Some(q) => run_with_output(paru().args(["-Qs", q])),
+            None => run_with_output(paru().arg("-Q")),
+        };
+
+        for line in output.lines() {
+            // Skip description lines (indented) and empty lines
+            if line.is_empty() || line.starts_with(' ') {
+                continue;
+            }
+            // Strip 'local/' prefix added by -Qs
+            let clean = line.strip_prefix("local/").unwrap_or(line);
+            let pkg_name = clean.split_whitespace().next().unwrap_or(clean);
+            let repo_name = repo_map.get(pkg_name).map(|s| s.as_str()).unwrap_or("aur");
+            println!("{}/{}", repo_name, clean);
+        }
+    } else {
+        let mut cmd = paru();
+        match query {
+            Some(q) => {
+                cmd.arg("-Qs");
+                cmd.arg(q);
+            }
+            None => {
+                cmd.arg("-Q");
+            }
+        }
+        run(&mut cmd);
+    }
 }
 
 pub fn whichpkg(paths: &[String], all: bool) {

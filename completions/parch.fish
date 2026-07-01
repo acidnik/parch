@@ -69,7 +69,7 @@ complete -c parch -n '__fish_parch_using_subcommand install i' -l needed    -d "
 complete -c parch -n '__fish_parch_using_subcommand uninstall u' -s y -l noconfirm -d 'Skip confirmation prompts'
 complete -c parch -n '__fish_parch_using_subcommand update up' -s y -l noconfirm -d 'Skip confirmation prompts'
 complete -c parch -n '__fish_parch_using_subcommand clean c' -s y -l noconfirm -d 'Skip confirmation prompts'
-
+complete -c parch -n '__fish_parch_using_subcommand list l' -s r -l repo -d 'Show repository prefix (core/extra/aur)'
 # ── Global flags ─────────────────────────────────────────────────────────────
 complete -c parch -s v -l verbose -d 'Print the paru command'
 # ── Dynamic: available packages with AUR support (install, search) ────────

@@ -112,6 +112,10 @@ struct SearchArgs {
 
 #[derive(Args)]
 struct ListArgs {
+    /// Show repository prefix (core/extra/aur)
+    #[arg(short = 'r', long)]
+    repo: bool,
+
     /// Optional filter to search installed packages
     query: Option<String>,
 }
@@ -186,7 +190,7 @@ fn main() {
         }
         Commands::List(args) => {
             commands::set_verbose(cli.verbose);
-            commands::list(args.query.as_deref());
+            commands::list(args.query.as_deref(), args.repo);
         }
         Commands::WhichPkg(args) => {
             commands::set_verbose(cli.verbose);
@@ -298,7 +302,7 @@ complete -c parch -n '__fish_parch_using_subcommand install i' -l needed    -d "
 complete -c parch -n '__fish_parch_using_subcommand uninstall u' -s y -l noconfirm -d 'Skip confirmation prompts'
 complete -c parch -n '__fish_parch_using_subcommand update up' -s y -l noconfirm -d 'Skip confirmation prompts'
 complete -c parch -n '__fish_parch_using_subcommand clean c' -s y -l noconfirm -d 'Skip confirmation prompts'
-
+complete -c parch -n '__fish_parch_using_subcommand list l' -s r -l repo -d 'Show repository prefix (core/extra/aur)'
 # ── Global flags ─────────────────────────────────────────────────────────────
 complete -c parch -s v -l verbose -d 'Print the paru command'
 # ── Dynamic: available packages with AUR support (install, search) ────────
